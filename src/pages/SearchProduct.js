@@ -4,17 +4,17 @@ import { useLocation } from "react-router-dom";
 import VerticalCart from "../components/VerticalCart";
 
 const SearchProduct = () => {
-  const query = useLocation();
+  const location = useLocation();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  console.log("query", query.search);
+  const queryParams = new URLSearchParams(location.search);
+  const searchQuery = queryParams.get("q") || "";
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchProduct = async () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/search${query.search}`
+        `${process.env.REACT_APP_BACKEND_URL}/api/search?q=${searchQuery}`
       );
       console.log("response", response.data);
       setData(response.data.data);
@@ -27,7 +27,7 @@ const SearchProduct = () => {
 
   useEffect(() => {
     fetchProduct();
-  }, [fetchProduct, query]);
+  }, [searchQuery]);
 
   return (
     <div className="container mx-auto p-4 font-serif">

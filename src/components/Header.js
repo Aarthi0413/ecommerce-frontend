@@ -3,7 +3,7 @@ import axios from "axios";
 import { GrSearch } from "react-icons/gr";
 import { FaCircleUser } from "react-icons/fa6";
 import { FaCartShopping } from "react-icons/fa6";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { setUserDetails } from "../store/userSlice";
@@ -16,9 +16,8 @@ const Header = () => {
   const [menuDisplay, setMenuDisplay] = useState(false);
   const context = useContext(Context);
   const navigate = useNavigate();
-  const searchInput = useLocation()
-  const [search, setSearch] = useState(searchInput?.search?.split("=")[1])
-  console.log("search input",searchInput?.search.split("=")[1]);
+  const [search, setSearch] = useState("");
+  let debounceTimeout = null;
 
   //console.log("user header", user);
   const userId = user?.data?._id;
@@ -39,15 +38,20 @@ const Header = () => {
 
   //console.log("header add to cart count", context);
 
-  const handleSearch = (e) =>{
-    const {value} = e.target
-    setSearch(value)
-    if(value){
-      navigate(`/search?q=${value}`)
-    }else{
-      navigate('/search')
-    }
-  }
+  const handleSearch = (e) => {
+    const { value } = e.target;
+    setSearch(value);
+
+    if (debounceTimeout) clearTimeout(debounceTimeout);
+
+    debounceTimeout = setTimeout(() => {
+      if (value) {
+        navigate(`/search?q=${value}`);
+      } else {
+        navigate('/search');
+      }
+    }, 300); // 300ms debounce
+  };
 
   return (
     <header className="h-16 shadow-md bg-white font-serif fixed w-full z-40">
